@@ -6,7 +6,10 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <pthread.h>
+#include <unistd.h>
 #include "socket_tcp.h"
+#include "socket_udp.h"
 #include "wrap.h"
 
 #define FIFO "/home/cbf/lot_server/fifo/"
@@ -20,6 +23,8 @@ struct lot_Attributes{
 	char position_write[200];
 	char position_read[200];
 };
+
+pthread_t ntid;
 
 void make_lot(struct lot_Attributes lot[],int quantity,char *lot_id);
 int make_fifo(char* fifo_name_write,char* fifo_name_read);

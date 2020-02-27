@@ -15,9 +15,9 @@ int main()
 			return -1;
 		}
 	}
-	int fd_sign,n=0;
+	int fd_sign, n=0, err;
 	struct lot_Attributes lot[20];
-	int quantity=0;
+	int quantity = 0;
 	fd_sign=open(FIFO_sign,O_RDONLY|O_NONBLOCK);
 
 	if(fd_sign<0)
@@ -29,6 +29,13 @@ int main()
 	char buff[MAXLINE]={0};			//receive from fifo and socket 
 	char message[MAXLINE]={0};		//write the date which send to server
 	int i=0;
+	
+	err = pthread_create(&ntid, NULL, socket_udp_server, NULL);	//udp_server
+	if (err != 0)
+	{
+		fprintf(stderr, "can't create thread: %s\n", strerror(err));
+		exit(1);
+	}
 	
 	while(1)
 	{
