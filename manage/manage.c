@@ -27,6 +27,7 @@ int main()
 	}	//open sign fifo
 	
 	char buff[MAXLINE]={0};			//receive from fifo and socket 
+	char send[MAXLINE]={0};	
 	char message[MAXLINE]={0};		//write the date which send to server
 	int i=0;
 	
@@ -85,11 +86,6 @@ communication:
 				{
 					perror("read error in lot");
 					exit(1);
-					/*/the lot is offline
-					//send the offline date to switch
-					printf("the %s is offline\n",lot[i].lot_id);
-					rearrange(quantity,i,lot);
-					quantity--;*/
 				}
 			}
 			else if(n==0)
@@ -120,6 +116,15 @@ communication:
 			{
 				//process the data
 				printf("%s\n",buff);
+				memset(send,0,sizeof(send));
+				strcat(send,buff);
+				err = pthread_create(&ntid, NULL, socket_udp_client, send);	//udp_server
+				if (err != 0)
+				{
+					fprintf(stderr, "can't create thread: %s\n", strerror(err));
+					exit(1);
+				}
+				memset(buff,0,sizeof(buff));
 			}
 		}
 	}
