@@ -26,10 +26,10 @@ int main()
 		return -1;
 	}	//open sign fifo
 	
-	char buff[MAXLINE]={0};			//receive from fifo and socket 
-	char send[MAXLINE]={0};	
-	char message[MAXLINE]={0};		//write the date which send to server
-	int i=0;
+	char buff[MAXLINE] = {0};			//receive from fifo and socket 
+	char send[MAXLINE] = {0};	
+	char message[MAXLINE] = {0};		//write the date which send to server
+	int i = 0;
 	
 	err = pthread_create(&ntid, NULL, socket_udp_server, NULL);	//udp_server
 	if (err != 0)
@@ -40,9 +40,9 @@ int main()
 	
 	while(1)
 	{
-		memset(buff,0,sizeof(buff));
-		n=read(fd_sign,buff,MAXLINE);
-		if(n<0)
+		memset(buff, 0, sizeof(buff));
+		n = read(fd_sign, buff, MAXLINE);
+		if(n < 0)
 		{	// there is no lot sign up
 			if (errno == EAGAIN)
 			{
@@ -51,32 +51,34 @@ int main()
 			perror("read fd_sign");
 			exit(1);
 		}
-		if(n==0)
+		if(n == 0)
 		{
 			goto communication;
 		}
 		
 		//sign up
-		memset(server_ip,0,sizeof(server_ip));
-		strcat(server_ip,SERVER_IP);
-		memset(message,0,sizeof(message));
-		strcat(message,"0");
-		strcat(message,&buff[1]);
-		n=socket_tcp(message,server_ip);
-		if(n==0)
+		memset(server_ip, 0, sizeof(server_ip));
+		strcat(server_ip, SERVER_IP);
+		
+		memset(message, 0, sizeof(message));
+		strcat(message, buff);
+		
+		n = socket_tcp(message, server_ip);
+		
+		if(n == 0)
 		{//success to sign up
-			make_lot(lot,quantity,&buff[1]);	//after success making lot,quantity++
+			make_lot(lot, quantity, buff);	//after success making lot,quantity++
 			quantity++;
 		}
 		else
 		{//fail to sign up
-			printf("%s sign error\n",&buff[1]);
+			printf("%s sign error\n", &buff[1]);
 		}
 		
 communication:
 		for(i=0;i<quantity;i++)
 		{
-			n=read(lot[i].fd_read,buff,MAXLINE);
+			n = read(lot[i].fd_read, buff, MAXLINE);
 			if(n<0)
 			{
 				if (errno == EAGAIN)
@@ -88,16 +90,16 @@ communication:
 					exit(1);
 				}
 			}
-			else if(n==0)
+			else if(n == 0)
 			{
 				//the lot is offline
-				memset(server_ip,0,sizeof(server_ip));
-				strcat(server_ip,SERVER_IP);
-				memset(message,0,sizeof(message));
-				strcat(message,"1");
-				strcat(message,lot[i].lot_id);
-				n=socket_tcp(message,server_ip);
-				if(n==0)
+				memset(server_ip, 0, sizeof(server_ip));
+				strcat(server_ip, SERVER_IP);
+				memset(message, 0, sizeof(message));
+				strcat(message, "1");
+				strcat(message, lot[i].lot_id);
+				n=socket_tcp(message, server_ip);
+				if(n == 0)
 				{//success offline
 					printf("the %s is offline now\n",lot[i].lot_id);
 					rearrange(quantity,i,lot);
@@ -115,16 +117,16 @@ communication:
 			else
 			{
 				//process the data
-				printf("%s\n",buff);
-				memset(send,0,sizeof(send));
-				strcat(send,buff);
+				printf("%s\n", buff);
+				memset(send, 0, sizeof(send));
+				strcat(send, buff);
 				err = pthread_create(&ntid, NULL, socket_udp_client, send);	//udp_server
 				if (err != 0)
 				{
 					fprintf(stderr, "can't create thread: %s\n", strerror(err));
 					exit(1);
 				}
-				memset(buff,0,sizeof(buff));
+				memset(buff, 0, sizeof(buff));
 			}
 		}
 	}
@@ -133,26 +135,27 @@ communication:
 
 
 void make_lot(struct lot_Attributes lot[],int quantity,char *lot_id)
-{
-	int n=0;
-	strcat(lot[quantity].lot_id,lot_id);
+{ //lot_id[0] is the type the lot, others is lot's id
+	int n = 0;
+	lot[quantity].lot_type = lot_id[0];
+	strcat(lot[quantity].lot_id, &lot_id[1]);
 	
-	strcat(lot[quantity].position_write,FIFO);
-	strcat(lot[quantity].position_write,lot_id);
-	strcat(lot[quantity].position_write,"_write.fifo");
+	strcat(lot[quantity].position_write, FIFO);
+	strcat(lot[quantity].position_write, &lot_id[1]);
+	strcat(lot[quantity].position_write, "_write.fifo");
 	
-	strcat(lot[quantity].position_read,FIFO);
-	strcat(lot[quantity].position_read,lot_id);
-	strcat(lot[quantity].position_read,"_read.fifo");
+	strcat(lot[quantity].position_read, FIFO);
+	strcat(lot[quantity].position_read, &lot_id[1]);
+	strcat(lot[quantity].position_read, "_read.fifo");
 	
-	n=make_fifo(lot[quantity].position_write,lot[quantity].position_read);
-	if(n==-1){printf("make fifo error!\n");}
+	n = make_fifo(lot[quantity].position_write, lot[quantity].position_read);
+	if(n == -1){printf("make fifo error!\n");}
 	
-	n=make_fd(&lot[quantity].fd_write,lot[quantity].position_read,1);
-	if(n==-1){printf("make fd error!\n");}
+	n = make_fd(&lot[quantity].fd_write, lot[quantity].position_read,1);
+	if(n == -1){printf("make fd error!\n");}
 	
-	n=make_fd(&lot[quantity].fd_read,lot[quantity].position_write,0);
-	if(n==-1){printf("make fd error!\n");}
+	n = make_fd(&lot[quantity].fd_read, lot[quantity].position_write,0);
+	if(n == -1){printf("make fd error!\n");}
 	
 }
 
@@ -160,9 +163,9 @@ int make_fifo(char* fifo_name_write,char* fifo_name_read)
 {	//it can make a fifo named fifo_name at the FIFO(#define) with way of type
 	//the write and read is for lot,so it is opposite in server
 	umask(0);
-	if(mkfifo(fifo_name_write,0664)<0)
+	if(mkfifo(fifo_name_write,0664) < 0)
 	{
-		if(errno==EEXIST)
+		if(errno == EEXIST)
 		{
 		}
 		else
@@ -172,9 +175,9 @@ int make_fifo(char* fifo_name_write,char* fifo_name_read)
 		}
 	}
 	umask(0);
-	if(mkfifo(fifo_name_read,0664)<0)
+	if(mkfifo(fifo_name_read,0664) < 0)
 	{
-		if(errno==EEXIST)
+		if(errno == EEXIST)
 		{
 		}
 		else
@@ -220,10 +223,10 @@ int make_fd(int *fd,char* name,int type)
 
 void rearrange(int quantity,int position,struct lot_Attributes lot[])
 {
-	int i=position;
-	for(;i<quantity-1;i++)
+	int i = position;
+	for(; i < quantity-1; i++)
 	{
-		lot[i]=lot[i+1];
+		lot[i] = lot[i+1];
 	}
-	memset(&lot[i],0,sizeof(struct lot_Attributes));
+	memset(&lot[i], 0, sizeof(struct lot_Attributes));
 }

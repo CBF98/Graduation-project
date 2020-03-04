@@ -11,6 +11,7 @@
 #include "socket_tcp.h"
 #include "socket_udp.h"
 #include "wrap.h"
+#include "data_processing.h"
 
 #define FIFO "/home/cbf/lot_server/fifo/"
 #define FIFO_sign "/home/cbf/lot_server/fifo/sign.fifo"
@@ -19,6 +20,7 @@
 struct lot_Attributes{
 	int fd_read;
 	int fd_write;
+	char lot_type;
 	char lot_id[100];
 	char position_write[200];
 	char position_read[200];
