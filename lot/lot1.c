@@ -1,14 +1,18 @@
 #include "lot1.h"
+#include "HextoTwo.h"
+#include "StringtoHex.h"
 
 int main()
 {
 	char id_own[25] = {0};
-	int id_int[24] = {0};
+	long int id_int[24] = {0};
 	strcat(id_own, ID);	//the string of the lot's ID
 	StringtoHex(id_own, id_int, 24);	//represent id as a hexadecimal number
 	// int id_int[24]={0X1,0X1,0X0,0X0,0X0,0X0,0X0,0X0,0X1,0X0,0X0,0X0,0X0,0X0,0X1,0XE,0XF,0X0,0X2,0X3,0XF,0XF,0XE,0XA};
-	char id_char[13] = {0};
+	char id_char[13];
+	memset(id_char, 0, sizeof(id_char));
 	HextoTwo(id_int, 24, id_char);	//represent id by every bits
+	printf("%d\n",(int)strlen(id_char));
 	umask(0);
 	if(mkfifo(FIFO_sign,0664)<0)
 	{
@@ -33,7 +37,7 @@ int main()
 	char name_read[200]={0};
 	strcat(sign, "0");	//type of the ID
 	strcat(sign, id_char);
-	write(fd,sign, strlen(sign));
+	write(fd, sign, strlen(sign));
 	printf("%s\n", sign);
 
 	strcat(name_write, FIFO);
@@ -66,21 +70,22 @@ int main()
 	printf("success:login!\n");
 	//delete[] login;
 	close(fd);
+	
+	char buff[1024]={0};
+
+	int fd_read = open(name_read,O_RDONLY|O_NONBLOCK);
+	int fd_write = open(name_write,O_WRONLY);
 
 	while(1)
 	{
 		int n;
-		char buff[1024]={0};
-
-		int fd_read=open(name_read,O_RDONLY|O_NONBLOCK);
-		int fd_write=open(name_write,O_WRONLY);
-		if(fd_read<0)
+		if(fd_read < 0)
 		{
 			perror("open read");
 			exit(1);
 		}
-		n=read(fd_read,buff,1024); //or 1023
-		if(n<0)
+		n = read(fd_read, buff, 1024); //or 1023
+		if(n < 0)
 		{
 			if (errno == EAGAIN)
 			{
@@ -94,10 +99,17 @@ int main()
 			//process the data
 		}
 next_step:
-		//determine when to write		
-		scanf("%s",buff);
-		write(fd_write,buff,strlen(buff));
-		
+		//determine when to write	
+		memset(buff, 0, sizeof(buff));	
+		sleep(2);
+		strcat(buff, "0");
+		strcat(buff, id_char);
+		strcat(buff, "0");
+		strcat(buff, id_char);
+		printf("%s\n",buff);
+		// scanf("%s",buff);
+		write(fd_write, buff, strlen(buff));
+		sleep(2);
 		//when the lot want to offline,it can close the fd_write and fd_read
 		//close(fd_write)
 		//close(fd_read)

@@ -6,9 +6,8 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include "HextoTwo.h"
-#include "StringtoHex.h"
 
-#define ID "110000001000001EF023FFEA"
+
+#define ID "110101011010101EF023FFEA"
 #define FIFO "/home/cbf/lot_server/fifo/"
 #define FIFO_sign "/home/cbf/lot_server/fifo/sign.fifo"

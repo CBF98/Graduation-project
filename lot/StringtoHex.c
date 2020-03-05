@@ -1,6 +1,6 @@
 #include "StringtoHex.h"
 
-void StringtoHex(char* buff, int* hex, int n)
+void StringtoHex(char* buff,long int* hex, int n)
 {
 	int i;
 	char a[2] = {'0', '\0'};

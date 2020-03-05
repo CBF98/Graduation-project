@@ -1,6 +1,6 @@
 #include "HextoTwo.h"
 
-void HextoTwo(int* id, int n, char* id_char)
+void HextoTwo(long int* id, int n, char* id_char)
 {
 	int m = 4*n,i,j,t = n/2;
 	int id_int[m];
@@ -14,16 +14,17 @@ void HextoTwo(int* id, int n, char* id_char)
 	{
 		for(j = 0; j < 4; j++)
 		{
-			id_int[4*i+j] = reference[id[i]][j];
+			id_int[4*i+j] = reference[(int)id[i]][j];
 		}
 	}
+	printf("t=%d\n",t);
 	for(i = 0; i < t; i++)
 	{
 		for(j = 0; j < 8; j++)
 		{
 			if(id_int[8*i+j] == 1)
 			{
-				id_char[i] = id_char[i] | (0x1 << (8-j));
+				id_char[i] = id_char[i] | (0x1 << (7-j));
 			}
 		}
 	}

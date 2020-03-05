@@ -3,4 +3,4 @@
 #include <string.h>
 #define MAX_ID 200
 
-void HextoTwo(int* id, int n, char* id_char);
+void HextoTwo(long int* id, int n, char* id_char);
