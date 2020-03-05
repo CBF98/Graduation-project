@@ -1,4 +1,6 @@
 #include "socket_udp.h"
+#include "manage.h"
+#include "wrap.h"
 
 void* socket_udp_server(void *arg)
 {
@@ -39,10 +41,18 @@ void* socket_udp_server(void *arg)
 		
 void* socket_udp_client(void *arg)
 {
+	
+	struct Thread_data *my_data;
 	struct sockaddr_in servaddr;
 	int sockfd, n;
-	char buf[MAX_DATA] = {0};
-	strcat(buf, arg);
+	char buf[MAX_DATA];
+	
+	my_data = (struct Thread_data *)arg;
+	Thread_status[my_data->quantity] = 1;
+	
+	memset(buf, 0, sizeof(buf));
+	strcat(buf, my_data->send);
+	
 	char str[INET_ADDRSTRLEN];
 	socklen_t servaddr_len;
 	
@@ -61,4 +71,5 @@ void* socket_udp_client(void *arg)
 		perr_exit("recvfrom error");
 	//process the received data
 	printf("%s\n",buf);
+	Thread_status[my_data->quantity] = 0;
 }

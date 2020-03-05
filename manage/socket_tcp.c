@@ -1,4 +1,6 @@
 #include "socket_tcp.h"
+#include "manage.h"
+
 int socket_tcp(char message[],char ip_server[])
 {
 	struct sockaddr_in servaddr;

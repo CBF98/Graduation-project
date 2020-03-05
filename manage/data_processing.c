@@ -1,5 +1,7 @@
 #include "data_processing.h"
 
+
+
 void obtain_lot_id(char* buff, char* destination, char* source)
 {	//the first char of destination and source is the lot's type
 	int i;
@@ -19,18 +21,4 @@ void obtain_lot_id(char* buff, char* destination, char* source)
 	}
 }
 
-int match_lot(char* buff, struct lot_Attributes lot[], int quantity)
-{
-	int i;
-	for(i = 0; i < quantity; i++)
-	{
-		if(buff[0] == lot[i].lot_type)
-		{
-			if(strcmp(&buff[1], lot[i].lot_id) == 0)
-			{
-				return i;
-			}
-		}
-	}
-	return -1;
-}
+

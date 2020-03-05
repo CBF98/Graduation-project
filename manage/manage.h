@@ -8,14 +8,14 @@
 #include <sys/types.h>
 #include <pthread.h>
 #include <unistd.h>
-#include "socket_tcp.h"
-#include "socket_udp.h"
-#include "wrap.h"
-#include "data_processing.h"
+
+
 
 #define FIFO "/home/cbf/lot_server/fifo/"
 #define FIFO_sign "/home/cbf/lot_server/fifo/sign.fifo"
 #define SERVER_IP "127.0.0.1"
+#define MAX_THREAD 4
+#define MAXLINE 200
 
 struct lot_Attributes{
 	int fd_read;
@@ -26,9 +26,21 @@ struct lot_Attributes{
 	char position_read[200];
 };
 
-pthread_t ntid;
+struct lot_Attributes lot[20];
+
+struct Thread_data{
+	int quantity;
+	char send[MAXLINE];
+};
+
+struct Thread_data thread_arg[MAX_THREAD];
+
+int Thread_status[MAX_THREAD];
+
+pthread_t ntid[MAX_THREAD];
 
 void make_lot(struct lot_Attributes lot[],int quantity,char *lot_id);
 int make_fifo(char* fifo_name_write,char* fifo_name_read);
 int make_fd(int *fd,char* name,int type);
 void rearrange(int quantity,int position,struct lot_Attributes lot[]);
+int match_lot(char* buff, struct lot_Attributes lot[], int quantity);

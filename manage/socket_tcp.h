@@ -11,7 +11,9 @@
 #include <arpa/inet.h>
 #include "wrap.h"
 
-#define MAXLINE 200
+
 #define SERV_PORT 8000
+
+
 
 int socket_tcp(char message[],char ip_server[]);

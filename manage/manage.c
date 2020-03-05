@@ -1,8 +1,20 @@
 #include "manage.h"
+#include "socket_tcp.h"
+#include "socket_udp.h"
+#include "wrap.h"
+#include "data_processing.h"
 
 int main()
 {
 	char server_ip[20]={0};
+	char buff[MAXLINE] = {0};			//receive from fifo and socket 
+	char send[MAXLINE] = {0};	
+	char message[MAXLINE] = {0};		//write the date which send to server
+	int i = 0, j = 0, thread_quantity = 0;
+	char des_id[20] = {0};
+	char sour_id[20] = {0};
+	memset(Thread_status, 0, sizeof(Thread_status));
+	
 	umask(0);
 	if(mkfifo(FIFO_sign,0664)<0)
 	{
@@ -16,7 +28,6 @@ int main()
 		}
 	}
 	int fd_sign, n=0, err;
-	struct lot_Attributes lot[20];
 	int quantity = 0;
 	fd_sign=open(FIFO_sign,O_RDONLY|O_NONBLOCK);
 
@@ -26,17 +37,15 @@ int main()
 		return -1;
 	}	//open sign fifo
 	
-	char buff[MAXLINE] = {0};			//receive from fifo and socket 
-	char send[MAXLINE] = {0};	
-	char message[MAXLINE] = {0};		//write the date which send to server
-	int i = 0;
+
 	
-	err = pthread_create(&ntid, NULL, socket_udp_server, NULL);	//udp_server
+	err = pthread_create(&ntid[0], NULL, socket_udp_server, NULL);	//udp_server
 	if (err != 0)
 	{
 		fprintf(stderr, "can't create thread: %s\n", strerror(err));
 		exit(1);
 	}
+	Thread_status[0] = 1;
 	
 	while(1)
 	{
@@ -78,7 +87,13 @@ int main()
 communication:
 		for(i=0;i<quantity;i++)
 		{
+			
+			memset(buff, 0, sizeof(buff));
+			memset(des_id, 0, sizeof(des_id));
+			memset(sour_id, 0, sizeof(sour_id));
+			
 			n = read(lot[i].fd_read, buff, MAXLINE);
+			
 			if(n<0)
 			{
 				if (errno == EAGAIN)
@@ -90,6 +105,7 @@ communication:
 					exit(1);
 				}
 			}
+			
 			else if(n == 0)
 			{
 				//the lot is offline
@@ -118,15 +134,39 @@ communication:
 			{
 				//process the data
 				printf("%s\n", buff);
-				memset(send, 0, sizeof(send));
-				strcat(send, buff);
-				err = pthread_create(&ntid, NULL, socket_udp_client, send);	//udp_server
-				if (err != 0)
-				{
-					fprintf(stderr, "can't create thread: %s\n", strerror(err));
-					exit(1);
+				obtain_lot_id(buff, des_id, sour_id);
+				n = match_lot(des_id, lot, quantity);
+				printf("%s\n",des_id);
+				printf("%s\n",sour_id);
+				printf("%s\n",lot[i].lot_id);
+				if(n != -1)
+				{	//the lot is belong the manage
+					printf("success send!\n");
 				}
-				memset(buff, 0, sizeof(buff));
+				else
+				{	//the lot is not belong the manage
+thread_next:
+				printf("what happened?\n");
+				sleep(2);
+					for(thread_quantity = 1; thread_quantity < MAX_THREAD; thread_quantity++)
+					{
+						if(Thread_status[thread_quantity] == 0)
+						{
+							memset(thread_arg[thread_quantity].send, 0, sizeof(send));
+							strcat(thread_arg[thread_quantity].send, buff);
+							thread_arg[thread_quantity].quantity = thread_quantity;
+							err = pthread_create(&ntid[thread_quantity], NULL, socket_udp_client, &(thread_arg[thread_quantity]));
+							if (err != 0)
+							{
+								fprintf(stderr, "can't create thread: %s\n", strerror(err));
+								exit(1);
+							}
+							break;
+						}
+					}
+					goto thread_next;
+				}
+				
 			}
 		}
 	}
@@ -229,4 +269,22 @@ void rearrange(int quantity,int position,struct lot_Attributes lot[])
 		lot[i] = lot[i+1];
 	}
 	memset(&lot[i], 0, sizeof(struct lot_Attributes));
+}
+
+int match_lot(char* buff, struct lot_Attributes lot[], int quantity)
+{
+	int i;
+	for(i = 0; i < quantity; i++)
+	{
+		if(buff[0] == lot[i].lot_type)
+		{
+			printf("look here!\n");
+			if(strcmp(&buff[1], lot[i].lot_id) == 0)
+			{
+				printf("here!\n");
+				return i;
+			}
+		}
+	}
+	return -1;
 }
