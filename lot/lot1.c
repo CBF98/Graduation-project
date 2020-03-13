@@ -25,8 +25,8 @@ int main()
 			return -1;
 		}
 	}
-	int fd=open(FIFO_sign,O_WRONLY);
-	if(fd<0)
+	int fd = open(FIFO_sign,O_WRONLY);
+	if(fd < 0)
 	{
 		perror("open error\n");
 		return -1;

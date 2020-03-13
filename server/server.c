@@ -1,16 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <netinet/in.h>
+#include "server.h"
 #include "wrap.h"
-
-#define MAXLINE 80
-#define SERV_PORT 8000
+#include "data_processing.h"
 
 int main(int argc, char **argv)
 {
 	int i, maxi, maxfd, listenfd, connfd, sockfd;
-	int nready, client[FD_SETSIZE];
+	int nready;
 	ssize_t n;
 	fd_set rset, allset;
 	char buf[MAXLINE];
@@ -32,8 +27,9 @@ int main(int argc, char **argv)
 	
 	maxfd = listenfd;
 	maxi = -1;
+	memset(client, 0, sizeof(client));
 	for (i = 0; i < FD_SETSIZE; i++)
-		client[i] = -1;
+		client[i].client_status = -1;
 	FD_ZERO(&allset);
 	FD_SET(listenfd, &allset);
 	
@@ -52,8 +48,9 @@ int main(int argc, char **argv)
 			printf("received from %s at PORT %d\n",inet_ntop(AF_INET, &cliaddr.sin_addr, str, sizeof(str)),ntohs(cliaddr.sin_port));
 			
 			for (i = 0; i < FD_SETSIZE; i++)
-				if (client[i] < 0) {
-					client[i] = connfd;
+				if (client[i].client_status < 0) {
+					client[i].client_status = connfd;
+					strcpy(client[i].client_ip, inet_ntop(AF_INET, &cliaddr.sin_addr, str, sizeof(str)));
 					break;
 				}
 			
@@ -74,7 +71,7 @@ int main(int argc, char **argv)
 		
 		for (i = 0; i <= maxi; i++)
 		{
-			if ( (sockfd = client[i]) < 0)
+			if ( (sockfd = client[i].client_status) < 0)
 				continue;
 			if (FD_ISSET(sockfd, &rset))
 			{
@@ -82,15 +79,14 @@ int main(int argc, char **argv)
 				{
 					Close(sockfd);
 					FD_CLR(sockfd, &allset);
-					client[i] = -1;
+					client[i].client_status = -1;
+					memset(client[i].client_ip, 0, sizeof(client[i].client_ip));
 					printf("offline!\n");
 				}
 				else
 				{//process the data
-					printf("hello!\n");
-					for(i=0; i<n; i++)
-						buf[i] = 'h';
-					write(connfd, buf, n);
+                    Extract_data(i, buf);
+                    write(connfd, "hello", n);
 				}
 				
 				if (--nready == 0)

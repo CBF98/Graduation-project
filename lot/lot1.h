@@ -8,6 +8,6 @@
 #include <sys/types.h>
 
 
-#define ID "110101011010101EF023FFEA"
-#define FIFO "/home/cbf/lot_server/fifo/"
-#define FIFO_sign "/home/cbf/lot_server/fifo/sign.fifo"
+#define ID "8B5AB1B781FA5DFEF123FFEA"
+#define FIFO "/home/cbf/fifo/"
+#define FIFO_sign "/home/cbf/fifo/sign.fifo"

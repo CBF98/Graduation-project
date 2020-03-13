@@ -29,7 +29,7 @@ int main()
 	}
 	int fd_sign, n=0, err;
 	int quantity = 0;
-	fd_sign=open(FIFO_sign,O_RDONLY|O_NONBLOCK);
+	fd_sign = open(FIFO_sign,O_RDONLY|O_NONBLOCK);
 
 	if(fd_sign<0)
 	{
@@ -70,6 +70,7 @@ int main()
 		strcat(server_ip, SERVER_IP);
 		
 		memset(message, 0, sizeof(message));
+		message[0] = '0';
 		strcat(message, buff);
 		
 		n = socket_tcp(message, server_ip);
@@ -112,15 +113,16 @@ communication:
 				memset(server_ip, 0, sizeof(server_ip));
 				strcat(server_ip, SERVER_IP);
 				memset(message, 0, sizeof(message));
-				strcat(message, "1");
+				message[0] = '1';
+				message[1] = lot[i].lot_type;
 				strcat(message, lot[i].lot_id);
-				n=socket_tcp(message, server_ip);
+				n = socket_tcp(message, server_ip);
 				if(n == 0)
 				{//success offline
 					printf("the %s is offline now\n",lot[i].lot_id);
 					rearrange(quantity,i,lot);
 					quantity--;
-					for(int k=0;k<quantity;k++)
+					for(int k = 0; k < quantity; k++)
 					{
 						printf("%d   %s\n",k,lot[i].lot_id);
 					}
