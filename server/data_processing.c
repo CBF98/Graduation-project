@@ -52,6 +52,35 @@ int Extract_data(int num, char* buff)
     if( buf[0] == '1')
     {
         // sign down
+        if( buf[1] == '0')
+        {
+            //EPC
+            if ( NULL == mysql_real_connect(&mysql, "localhost", "root", "hengheng", "test1", 0, NULL, 0)){
+                printf("connect error ! %s", mysql_error(&mysql));
+                return -1;
+            }
+            printf("success connect!\n");
+            char* head = NULL;
+            char* company = NULL;
+            char* type = NULL;
+            char* object = NULL;
+            head = (char*)malloc(3);
+            company = (char*)malloc(8);
+            type = (char*)malloc(7);
+            object = (char*)malloc(10);
+            EPC_data(buf, head, company, type, object);
+            printf("%s\n%s\n%s\n%s\n",head, company, type, object);
+            sprintf(query_str, "delete from EPC%s%s%s where ID = '%s'", head, company, type, object);
+            rc = mysql_real_query(&mysql, query_str, strlen(query_str));
+            if (0 != rc) {
+                printf("mysql_real_query(): %s\n", mysql_error(&mysql));
+                return -1;
+            }
+            free(head);
+            free(company);
+            free(type);
+            free(object);
+        }
     }
 
     if( buf[0] == '2')
