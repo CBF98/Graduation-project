@@ -4,16 +4,12 @@
 int Extract_data(int num, char* buff)
 {   // return 0 represent success, -1 represent error
     char* buf = NULL;
-    buf = (char*)malloc(MAXLINE);
+    buf = (char*)calloc(1, MAXLINE);
     strcpy(buf, buff);
     MYSQL mysql;
     int rc;
     char *query_str = NULL;
-    query_str = (char*)malloc(150);
-    if( NULL == mysql_init(&mysql) ){
-        printf("error! %s\n", mysql_error(&mysql));
-        return -1;
-    }
+    query_str = (char*)calloc(1, 150);
 
     if( buf[0] == '0')
     {
@@ -21,35 +17,43 @@ int Extract_data(int num, char* buff)
         if ( buf[1] == '0')
         {
             //EPC
-            if ( NULL == mysql_real_connect(&mysql, "localhost", "root", "hengheng", "test1", 0, NULL, 0)){
-                printf("connect error ! %s", mysql_error(&mysql));
-                return -1;
-            }
-            printf("success connect!\n");
             char* head = NULL;
             char* company = NULL;
             char* type = NULL;
             char* object = NULL;
+
             head = (char*)calloc(1, EPC_head + 1);
             company = (char*)calloc(1, EPC_company + 1);
             type = (char*)calloc(1, EPC_type + 1);
             object = (char*)calloc(1, EPC_object + 1);
+
             EPC_data(buf, head, company, type, object);
-            printf("%s\n%s\n%s\n%s\n",head, company, type, object);
+            EPC_up_requery:
+            printf("%s\n%s\n%s\n%s\n", head, company, type, object);
             sprintf(query_str, "insert into EPC%s%s%s values('%s', '%s')", head, company, type, object, client[num].client_ip);
-            rc = mysql_real_query(&mysql, query_str, strlen(query_str));
+
+            rc = mysql_real_query(&mysql_EPC, query_str, strlen(query_str));
+
             if (0 != rc) {
+                printf("%d\n", rc);
+                if(2013 == mysql_errno(&mysql_EPC)){
+                    if ( NULL == mysql_real_connect(&mysql_EPC, "localhost", "root", "hengheng", "test1", 0, NULL, 0)){
+                        printf("connect error ! %s", mysql_error(&mysql_EPC));
+                        return -1;
+                    }
+                    goto EPC_up_requery;
+                }
                 printf("mysql_real_query(): %s\n", mysql_error(&mysql));
                 return -1;
             }
+
             free(head);
             free(company);
             free(type);
             free(object);
         }
-        if( buf[1] = '1')
+        else if( buf[1] = '1')
         {
-            memset(query_str, 0, sizeof(query_str));
 
             char* Version = NULL;
             char* NSI = NULL;
@@ -62,18 +66,23 @@ int Extract_data(int num, char* buff)
             IC = (char*)calloc(1, Ecode_IC + 1);
 
             Ecode_data(buf, Version, NSI, AC, IC);
-            if ( NULL == mysql_real_connect(&mysql, "localhost", "root", "hengheng", "test2", 0, NULL, 0)){
-                printf("connect error ! %s", mysql_error(&mysql));
-                return -1;
-            }
-            printf("%s\n%s\n%s\n%s\n", Version, NSI, AC, IC);
-
+            Ecode_up_requery:
             sprintf(query_str, "insert into Ecode%s%s%s values('%s', '%s')", Version, NSI, AC, IC, client[num].client_ip);
-            rc = mysql_real_query(&mysql, query_str, strlen(query_str));
+
+            rc = mysql_real_query(&mysql_Ecode, query_str, strlen(query_str));
             if (0 != rc) {
+
+                if(2013 == mysql_errno(&mysql_Ecode)){
+                    if ( NULL == mysql_real_connect(&mysql_Ecode, "localhost", "root", "hengheng", "test1", 0, NULL, 0)){
+                        printf("connect error ! %s", mysql_error(&mysql_Ecode));
+                        return -1;
+                    }
+                    goto Ecode_up_requery;
+                }
                 printf("mysql_real_query(): %s\n", mysql_error(&mysql));
                 return -1;
             }
+
             free(Version);
             free(NSI);
             free(AC);
@@ -87,31 +96,72 @@ int Extract_data(int num, char* buff)
         if( buf[1] == '0')
         {
             //EPC
-            if ( NULL == mysql_real_connect(&mysql, "localhost", "root", "hengheng", "test1", 0, NULL, 0)){
-                printf("connect error ! %s", mysql_error(&mysql));
-                return -1;
-            }
-            printf("success connect!\n");
             char* head = NULL;
             char* company = NULL;
             char* type = NULL;
             char* object = NULL;
+
             head = (char*)malloc(3);
             company = (char*)malloc(8);
             type = (char*)malloc(7);
             object = (char*)malloc(10);
+
             EPC_data(buf, head, company, type, object);
-            printf("%s\n%s\n%s\n%s\n",head, company, type, object);
+
             sprintf(query_str, "delete from EPC%s%s%s where ID = '%s'", head, company, type, object);
-            rc = mysql_real_query(&mysql, query_str, strlen(query_str));
+            EPC_down_requery:
+            rc = mysql_real_query(&mysql_EPC, query_str, strlen(query_str));
             if (0 != rc) {
-                printf("mysql_real_query(): %s\n", mysql_error(&mysql));
+                if(2013 == mysql_errno(&mysql_EPC)){
+                    if ( NULL == mysql_real_connect(&mysql_EPC, "localhost", "root", "hengheng", "test1", 0, NULL, 0)){
+                        printf("connect error ! %s", mysql_error(&mysql_EPC));
+                        return -1;
+                    }
+                    goto EPC_down_requery;
+                }
+                printf("mysql_real_query(): %s\n", mysql_error(&mysql_EPC));
                 return -1;
             }
+
             free(head);
             free(company);
             free(type);
             free(object);
+        }
+
+        else if( buf[1] == '1')
+        {
+            char* Version = NULL;
+            char* NSI = NULL;
+            char* AC = NULL;
+            char* IC = NULL;
+
+            Version = (char*)calloc(1, Ecode_Version + 1);
+            NSI = (char*)calloc(1, Ecode_NSI + 1);
+            AC = (char*)calloc(1, Ecode_AC + 1);
+            IC = (char*)calloc(1, Ecode_IC + 1);
+
+            Ecode_data(buf, Version, NSI, AC, IC);
+            Ecode_down_requery:
+            sprintf(query_str, "delete from Ecode%s%s%s where ID = '%s'", Version, NSI, AC, IC);
+
+            rc = mysql_real_query(&mysql_Ecode, query_str, strlen(query_str));
+            if (0 != rc) {
+                if(2013 == mysql_errno(&mysql_Ecode)){
+                    if ( NULL == mysql_real_connect(&mysql_Ecode, "localhost", "root", "hengheng", "test1", 0, NULL, 0)){
+                        printf("connect error ! %s", mysql_error(&mysql_Ecode));
+                        return -1;
+                    }
+                    goto Ecode_down_requery;
+                }
+                printf("mysql_real_query(): %s\n", mysql_error(&mysql_Ecode));
+                return -1;
+            }
+
+            free(Version);
+            free(NSI);
+            free(AC);
+            free(IC);
         }
     }
 

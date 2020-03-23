@@ -29,3 +29,21 @@ void HextoTwo(long int* id, int n, char* id_char)
 		}
 	}
 }
+
+void StringtoTwo(char* id_char, int n, char* id_two)
+{
+    int i;
+    long int id_ten[n];
+    memset(id_ten, 0, sizeof(id_ten));
+    for(i = 0; i < n; i++){
+        if(id_char[i] >= 48 && id_char[i] <= 57) {
+            if (id_char[i] == 48) {
+                id_ten[i] = 10;
+                continue;
+            }
+            id_ten[i] = id_char[i] - 48;
+        }
+    }
+    id_two[0] = id_ten[0] + 48;
+    HextoTwo(&id_ten[1], n, &id_two[1]);
+}

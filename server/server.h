@@ -2,11 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <netinet/in.h>
-#include "wrap.h"
+#include <mysql.h>
+#include <errmsg.h>
 
 #define MAXLINE 150
 #define SERV_PORT 8000
 #define database "/home/cbf/database/"
+
+MYSQL mysql_EPC;
+MYSQL mysql_Ecode;
 
 struct client_property{
     char client_ip[16];

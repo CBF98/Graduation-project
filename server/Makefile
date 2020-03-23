@@ -2,7 +2,7 @@ server: server.o wrap.o data_processing.o
 	gcc server.o wrap.o data_processing.o -o server `mysql_config --cflags --libs`
 
 server.o: server.c server.h
-	gcc -c server.c
+	gcc -c server.c `mysql_config --cflags --libs`
 
 wrap.o: wrap.c wrap.h
 	gcc -c wrap.c

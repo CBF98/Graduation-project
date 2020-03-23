@@ -95,7 +95,7 @@ communication:
 			
 			n = read(lot[i].fd_read, buff, MAXLINE);
 			
-			if(n<0)
+			if(n < 0)
 			{
 				if (errno == EAGAIN)
 				{

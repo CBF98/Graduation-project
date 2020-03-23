@@ -2,4 +2,4 @@
 #include <stdlib.h>
 #include <string.h>
 
-void StringtoTen(char* buff,long int* hex, int n);
+void StringtoTen(char* buff,int* hex, int n);

@@ -5,14 +5,15 @@
 int main()
 {
 	char id_own[25] = {0};
-	long int id_int[24] = {0};
 	strcat(id_own, ID);	//the string of the lot's ID
+
+	long int id_int[24] = {0};
 	StringtoHex(id_own, id_int, 24);	//represent id as a hexadecimal number
-	// int id_int[24]={0X1,0X1,0X0,0X0,0X0,0X0,0X0,0X0,0X1,0X0,0X0,0X0,0X0,0X0,0X1,0XE,0XF,0X0,0X2,0X3,0XF,0XF,0XE,0XA};
+
 	char id_char[13];
 	memset(id_char, 0, sizeof(id_char));
 	HextoTwo(id_int, 24, id_char);	//represent id by every bits
-	printf("%d\n",(int)strlen(id_char));
+
 	umask(0);
 	if(mkfifo(FIFO_sign,0664)<0)
 	{

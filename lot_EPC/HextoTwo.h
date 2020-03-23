@@ -4,3 +4,4 @@
 #define MAX_ID 200
 
 void HextoTwo(long int* id, int n, char* id_char);
+void StringtoTwo(char* id_char, int n, char* id_two);
