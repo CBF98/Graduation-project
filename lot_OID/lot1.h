@@ -8,7 +8,7 @@
 #include <sys/types.h>
 
 
-#define ID "13293A91E133D81123456789"
+#define ID "2.16.156.101818.11533251.12345678"
+#define lot_type "2"
 #define FIFO "/home/cbf/fifo/"
 #define FIFO_sign "/home/cbf/fifo/sign.fifo"
-#define lot_type "0"

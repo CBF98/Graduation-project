@@ -15,17 +15,28 @@ int main(int argc, char **argv)
         return -1;
     }
 
+	if( NULL == mysql_init(&mysql_OID) ){
+        printf("error! %s\n", mysql_error(&mysql_OID));
+        return -1;
+    }
+
     if ( NULL == mysql_real_connect(&mysql_EPC, "localhost", "root", "hengheng", "test1", 0, NULL, 0)){
         printf("connect error ! %s", mysql_error(&mysql_EPC));
         return -1;
     }
-    printf("success epc connect!\n");
+    printf("success epc connect EPC!\n");
 
     if ( NULL == mysql_real_connect(&mysql_Ecode, "localhost", "root", "hengheng", "test2", 0, NULL, 0)){
         printf("connect error ! %s", mysql_error(&mysql_Ecode));
         return -1;
     }
-    printf("success Ecode connect!\n");
+    printf("success Ecode connect Ecode!\n");
+
+	if ( NULL == mysql_real_connect(&mysql_OID, "localhost", "root", "hengheng", "test3", 0, NULL, 0)){
+        printf("connect error ! %s", mysql_error(&mysql_OID));
+        return -1;
+    }
+    printf("success Ecode connect OID!\n");
 
 	int i, maxi, maxfd, listenfd, connfd, sockfd;
 	int nready;

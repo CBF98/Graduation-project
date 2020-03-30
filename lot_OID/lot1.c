@@ -4,15 +4,13 @@
 
 int main()
 {
-	char id_own[25] = {0};
+    //because the Ecode coding will be two consecutive 0 ,so i use the 10 to represent 0
+	char id_own[34] = {0};
 	strcat(id_own, ID);	//the string of the lot's ID
 
-	long int id_int[24] = {0};
-	StringtoHex(id_own, id_int, 24);	//represent id as a hexadecimal number
-
-	char id_char[13];
+	unsigned char id_char[10];
 	memset(id_char, 0, sizeof(id_char));
-	HextoTwo(id_int, 24, id_char);	//represent id by every bits
+	Divide_OID(id_own, id_char);	//represent id by every bits
 
 	umask(0);
 	if(mkfifo(FIFO_sign,0664)<0)

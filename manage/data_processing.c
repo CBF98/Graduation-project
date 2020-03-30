@@ -19,6 +19,11 @@ void obtain_lot_id(char* buff, char* destination, char* source)
             strncpy(source, &buff[EPC_length + 1], Ecode_length + 1);
             source[Ecode_length + 1] = '\0';
         }
+		else if(buff[EPC_length + 1] == '2')
+		{
+			strncpy(source, &buff[EPC_length + 1], OID_length + 1);
+            source[OID_length + 1] = '\0';
+		}
 	}
 	else if(buff[0] == '1')
 	{
@@ -35,10 +40,32 @@ void obtain_lot_id(char* buff, char* destination, char* source)
             strncpy(source, &buff[Ecode_length + 1], Ecode_length + 1);
             source[Ecode_length + 1] = '\0';
         }
+		else if(buff[Ecode_length + 1] == '2')
+		{
+			strncpy(source, &buff[Ecode_length + 1], OID_length + 1);
+            source[OID_length + 1] = '\0';
+		}
 	}
-	else
+	else if(buff[0] == '2')
     {
-
+		//OID
+		strncpy(destination, &buff[0], OID_length + 1);
+		destination[OID_length + 1] = '\0';
+		if(buff[OID_length + 1] == '0')
+		{
+			strncpy(source, &buff[OID_length + 1], EPC_length + 1);
+            source[EPC_length + 1] = '\0';
+		}
+		else if(buff[OID_length + 1] == '1')
+		{
+			strncpy(source, &buff[OID_length + 1], Ecode_length + 1);
+            source[Ecode_length + 1] = '\0';
+		}
+		else if(buff[OID_length + 1] == '2')
+		{
+			strncpy(source, &buff[OID_length + 1], OID_length + 1);
+            source[OID_length + 1] = '\0';
+		}
     }
 }
 

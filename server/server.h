@@ -11,6 +11,7 @@
 
 MYSQL mysql_EPC;
 MYSQL mysql_Ecode;
+MYSQL mysql_OID;
 
 struct client_property{
     char client_ip[16];

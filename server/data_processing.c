@@ -43,7 +43,7 @@ int Extract_data(int num, char* buff)
                     }
                     goto EPC_up_requery;
                 }
-                printf("mysql_real_query(): %s\n", mysql_error(&mysql));
+                printf("mysql_real_query(): %s\n", mysql_error(&mysql_EPC));
                 return -1;
             }
 
@@ -52,7 +52,7 @@ int Extract_data(int num, char* buff)
             free(type);
             free(object);
         }
-        else if( buf[1] = '1')
+        else if( buf[1] == '1')
         {
 
             char* Version = NULL;
@@ -73,13 +73,13 @@ int Extract_data(int num, char* buff)
             if (0 != rc) {
 
                 if(2013 == mysql_errno(&mysql_Ecode)){
-                    if ( NULL == mysql_real_connect(&mysql_Ecode, "localhost", "root", "hengheng", "test1", 0, NULL, 0)){
+                    if ( NULL == mysql_real_connect(&mysql_Ecode, "localhost", "root", "hengheng", "test2", 0, NULL, 0)){
                         printf("connect error ! %s", mysql_error(&mysql_Ecode));
                         return -1;
                     }
                     goto Ecode_up_requery;
                 }
-                printf("mysql_real_query(): %s\n", mysql_error(&mysql));
+                printf("mysql_real_query(): %s\n", mysql_error(&mysql_Ecode));
                 return -1;
             }
 
@@ -87,6 +87,33 @@ int Extract_data(int num, char* buff)
             free(NSI);
             free(AC);
             free(IC);
+        }
+
+        else if( buf[1] == '2')
+        {
+
+            char* company = NULL;
+            char* object = NULL;
+
+            company = (char*)calloc(1, OID_company + 1);
+            object = (char*)calloc(1, OID_object + 1);
+
+            OID_data(buf, company, object);
+            OID_up_requery:
+            sprintf(query_str, "insert into OID%s values('%s', '%s')", company, object, client[num].client_ip);
+            rc = mysql_real_query(&mysql_OID, query_str, strlen(query_str));
+            if (0 != rc) {
+
+                if(2013 == mysql_errno(&mysql_OID)){
+                    if ( NULL == mysql_real_connect(&mysql_OID, "localhost", "root", "hengheng", "test3", 0, NULL, 0)){
+                        printf("connect error ! %s", mysql_error(&mysql_OID));
+                        return -1;
+                    }
+                    goto OID_up_requery;
+                }
+                printf("mysql_real_query(): %s\n", mysql_error(&mysql_OID));
+                return -1;
+            }
         }
     }
 
@@ -162,6 +189,32 @@ int Extract_data(int num, char* buff)
             free(NSI);
             free(AC);
             free(IC);
+        }
+
+        else if(buf[1] == '2')
+        {
+            char* company = NULL;
+            char* object = NULL;
+
+            company = (char*)calloc(1, OID_company + 1);
+            object = (char*)calloc(1, OID_object + 1);
+
+            OID_data(buf, company, object);
+            OID_down_requery:
+            sprintf(query_str, "delete from OID%s where ID = '%s'", company, object);
+            rc = mysql_real_query(&mysql_OID, query_str, strlen(query_str));
+            if (0 != rc) {
+
+                if(2013 == mysql_errno(&mysql_OID)){
+                    if ( NULL == mysql_real_connect(&mysql_OID, "localhost", "root", "hengheng", "test3", 0, NULL, 0)){
+                        printf("connect error ! %s", mysql_error(&mysql_OID));
+                        return -1;
+                    }
+                    goto OID_down_requery;
+                }
+                printf("mysql_real_query(): %s\n", mysql_error(&mysql_OID));
+                return -1;
+            }
         }
     }
 
@@ -285,5 +338,40 @@ void Ecode_data(char* buff, char* Version, char* NSI, char* AC, char* IC)
     data_int[5] = (unsigned int)(buf[10] & 15);
     DatatoTen_int(data_int, Ecode_IC, IC);
 
+    free(buf);
+}
+
+void OID_data(char* buff, char* company_id, char* object_id)
+{
+    unsigned char* buf = NULL;
+    buf = (char*)malloc(MAXLINE);
+    memset(buf, 0, sizeof(buf));
+    strcpy(buf, buff);
+    unsigned int data_int[10];
+    int i,j;
+
+    printf("hello\n");
+
+    data_int[0] = (unsigned int)(buf[2] >> 4);
+    data_int[1] = (unsigned int)(buf[2] & 15);
+    data_int[2] = (unsigned int)(buf[3] >> 4);
+    data_int[3] = (unsigned int)(buf[3] & 15);
+    data_int[4] = (unsigned int)(buf[4] >> 4);
+    data_int[5] = (unsigned int)(buf[4] & 15);
+    data_int[6] = (unsigned int)(buf[5] >> 4);
+    data_int[7] = (unsigned int)(buf[5] & 15);
+    DatatoTen_int(data_int, OID_company, company_id);
+
+    data_int[0] = (unsigned int)(buf[7] >> 4);
+    data_int[1] = (unsigned int)(buf[7] & 15);
+    data_int[2] = (unsigned int)(buf[8] >> 4);
+    data_int[3] = (unsigned int)(buf[8] & 15);
+    data_int[4] = (unsigned int)(buf[9] >> 4);
+    data_int[5] = (unsigned int)(buf[9] & 15);
+    data_int[6] = (unsigned int)(buf[10] >> 4);
+    data_int[7] = (unsigned int)(buf[10] & 15);
+    DatatoTen_int(data_int, OID_object, object_id);
+
+    printf("%s\n%s\n", company_id, object_id);
     free(buf);
 }
