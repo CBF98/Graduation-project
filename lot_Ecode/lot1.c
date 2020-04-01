@@ -5,12 +5,21 @@
 int main()
 {
     //because the Ecode coding will be two consecutive 0 ,so i use the 10 to represent 0
+	printf("hello\n");
 	char id_own[18] = {0};
+	printf("hello\n");
 	strcat(id_own, ID);	//the string of the lot's ID
 
 	unsigned char id_char[13];
 	memset(id_char, 0, sizeof(id_char));
 	StringtoTwo(id_own, 24, id_char);	//represent id by every bits
+
+	printf("hello\n");
+	char id_OID[34] = {0};
+	strcat(id_OID, OID_ID);
+	unsigned char id_OID_char[10];
+	memset(id_OID_char, 0, sizeof(id_OID_char));
+	Divide_OID(id_OID, id_OID_char);
 
 	umask(0);
 	if(mkfifo(FIFO_sign,0664)<0)
@@ -34,7 +43,7 @@ int main()
 	char sign[100]={0};
 	char name_write[200]={0};
 	char name_read[200]={0};
-	strcat(sign, lot_type);	//type of the ID
+	strcat(sign, Ecode_type);	//type of the ID
 	strcat(sign, id_char);
 	write(fd, sign, strlen(sign));
 	printf("%s\n", sign);
@@ -78,6 +87,7 @@ int main()
 	while(1)
 	{
 		int n;
+		memset(buff, 0, sizeof(buff));
 		if(fd_read < 0)
 		{
 			perror("open read");
@@ -96,14 +106,15 @@ int main()
 		else
 		{
 			//process the data
+			printf("%s\n", buff);
 		}
 next_step:
 		//determine when to write	
 		memset(buff, 0, sizeof(buff));	
 		sleep(2);
-		strcat(buff, lot_type);
-		strcat(buff, id_char);
-		strcat(buff, lot_type);
+		strcat(buff, OID_type);
+		strcat(buff, id_OID_char);
+		strcat(buff, Ecode_type);
 		strcat(buff, id_char);
 		printf("%s\n",buff);
 		// scanf("%s",buff);

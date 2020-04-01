@@ -27,8 +27,12 @@ int main()
 			return -1;
 		}
 	}
+
 	int fd_sign, n=0, err;
 	int quantity = 0;
+	int socket_status = 0;
+	int match_status = 0;
+
 	fd_sign = open(FIFO_sign,O_RDONLY|O_NONBLOCK);
 
 	if(fd_sign<0)
@@ -116,11 +120,11 @@ communication:
 				message[0] = '1';
 				message[1] = lot[i].lot_type;
 				strcat(message, lot[i].lot_id);
-				n = socket_tcp(message, server_ip);
-				if(n == 0)
+				socket_status = socket_tcp(message, server_ip);
+				if(socket_status == 0)
 				{//success offline
 					printf("the %s is offline now\n",lot[i].lot_id);
-					rearrange(quantity,i,lot);
+					rearrange(quantity, i, lot);
 					quantity--;
 					for(int k = 0; k < quantity; k++)
 					{
@@ -137,13 +141,17 @@ communication:
 				//process the data
 				printf("%s\n", buff);
 				obtain_lot_id(buff, des_id, sour_id);
-				n = match_lot(des_id, lot, quantity);
+				match_status = match_lot(des_id, lot, quantity);
 				printf("%s\n",des_id);
 				printf("%s\n",sour_id);
 				printf("%s\n",lot[i].lot_id);
-				if(n != -1)
+				printf("%d\n",match_status);
+				if(match_status != -1)
 				{	//the lot is belong the manage
 					printf("success send!\n");
+					memset(buff, 0, sizeof(buff));
+					strcat(buff, "hello");
+					write(lot[match_status].fd_write, buff, strlen(buff));
 				}
 				else
 				{	//the lot is not belong the manage

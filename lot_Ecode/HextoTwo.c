@@ -46,3 +46,33 @@ void StringtoTwo(char* id_char, int n, unsigned char* id_two)
     id_two[0] = id_ten[0] + 48;
     HextoTwo(&id_ten[1], n, &id_two[1]);
 }
+
+void Divide_OID(char* Ecode_id, char* lot_real_id)
+{
+	int i = 0;
+	char* lot_id = NULL;
+	lot_id = (char *)calloc(1, sizeof(char) * 18);
+	strcpy(lot_id, &Ecode_id[16]);
+
+	unsigned int id_ten[18];
+	memset(id_ten, 0, sizeof(id_ten));
+
+	for(i = 0; i < 8; i++){
+		if(lot_id[i] > 48 && lot_id[i] <= 57){
+			id_ten[i] = lot_id[i] - 48;
+		}
+	}
+
+	HextoTwo(id_ten, 8, lot_real_id);
+	lot_real_id[4] = '.';
+
+	for(i = 9; i < 17; i++){
+		if(lot_id[i] > 48 && lot_id[i] <= 57){
+			id_ten[i-9] = lot_id[i] - 48;
+		}
+	}
+
+	HextoTwo(id_ten, 8, &lot_real_id[5]);
+	lot_real_id[9] = '\0';
+	free(lot_id);
+}

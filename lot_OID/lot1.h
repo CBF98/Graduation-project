@@ -9,6 +9,7 @@
 
 
 #define ID "2.16.156.101818.11533251.12345678"
-#define lot_type "2"
+#define OID_type "2"
+#define Ecode_type "1"
 #define FIFO "/home/cbf/fifo/"
 #define FIFO_sign "/home/cbf/fifo/sign.fifo"

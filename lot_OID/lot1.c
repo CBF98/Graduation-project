@@ -34,7 +34,7 @@ int main()
 	char sign[100]={0};
 	char name_write[200]={0};
 	char name_read[200]={0};
-	strcat(sign, lot_type);	//type of the ID
+	strcat(sign, OID_type);	//type of the ID
 	strcat(sign, id_char);
 	write(fd, sign, strlen(sign));
 	printf("%s\n", sign);
@@ -78,6 +78,7 @@ int main()
 	while(1)
 	{
 		int n;
+		memset(buff, 0, sizeof(buff));
 		if(fd_read < 0)
 		{
 			perror("open read");
@@ -88,6 +89,7 @@ int main()
 		{
 			if (errno == EAGAIN)
 			{
+				printf("why\n");
 				goto next_step;// there is no data
 			}	
 			perror("read wrong!");
@@ -96,19 +98,25 @@ int main()
 		else
 		{
 			//process the data
+			printf("%s\n", buff);
+			printf("\n");
 		}
 next_step:
+		printf("hello world!\n");
+		sleep(3);
 		//determine when to write	
+		/*
 		memset(buff, 0, sizeof(buff));	
 		sleep(2);
-		strcat(buff, lot_type);
+		strcat(buff, OID_type);
 		strcat(buff, id_char);
-		strcat(buff, lot_type);
+		strcat(buff, OID_type);
 		strcat(buff, id_char);
 		printf("%s\n",buff);
 		// scanf("%s",buff);
 		write(fd_write, buff, strlen(buff));
 		sleep(2);
+		*/
 		//when the lot want to offline,it can close the fd_write and fd_read
 		//close(fd_write)
 		//close(fd_read)
