@@ -70,6 +70,7 @@ int main()
 		}
 		
 		//sign up
+		/*
 		memset(server_ip, 0, sizeof(server_ip));
 		strcat(server_ip, SERVER_IP);
 		
@@ -88,6 +89,9 @@ int main()
 		{//fail to sign up
 			printf("%s sign error\n", &buff[1]);
 		}
+		*/
+		make_lot(lot, quantity, buff);
+		quantity++;
 		
 communication:
 		for(i=0;i<quantity;i++)
@@ -114,6 +118,7 @@ communication:
 			else if(n == 0)
 			{
 				//the lot is offline
+				/*
 				memset(server_ip, 0, sizeof(server_ip));
 				strcat(server_ip, SERVER_IP);
 				memset(message, 0, sizeof(message));
@@ -136,6 +141,9 @@ communication:
 				{//fail offline
 					printf("fail offline!\n");
 				}
+				*/
+				rearrange(quantity, i, lot);
+				quantity--;
 			}
 			else
 			{
