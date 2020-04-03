@@ -126,7 +126,8 @@ communication:
 					printf("the %s is offline now\n",lot[i].lot_id);
 					rearrange(quantity, i, lot);
 					quantity--;
-					for(int k = 0; k < quantity; k++)
+					int k = 0;
+					for(k = 0; k < quantity; k++)
 					{
 						printf("%d   %s\n",k,lot[i].lot_id);
 					}
