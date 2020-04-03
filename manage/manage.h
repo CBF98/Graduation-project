@@ -11,8 +11,8 @@
 
 
 
-#define FIFO "/home/cbf/fifo/"
-#define FIFO_sign "/home/cbf/fifo/sign.fifo"
+#define FIFO "/home/mininet/fifo/"
+#define FIFO_sign "/home/mininet/fifo/sign.fifo"
 #define SERVER_IP "127.0.0.1"
 #define MAX_THREAD 4
 #define MAXLINE 200
