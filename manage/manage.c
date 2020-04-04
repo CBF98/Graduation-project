@@ -165,7 +165,7 @@ communication:
 				else
 				{	//the lot is not belong the manage
 thread_next:
-				printf("what happened?\n");
+				printf("it's not belong here\n");
 				sleep(2);
 					for(thread_quantity = 1; thread_quantity < MAX_THREAD; thread_quantity++)
 					{
