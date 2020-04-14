@@ -3,6 +3,7 @@
 #include "socket_udp.h"
 #include "wrap.h"
 #include "data_processing.h"
+#include "pcap_send.h"
 
 int main()
 {
@@ -153,9 +154,15 @@ communication:
 					strcat(buff, "hello");
 					write(lot[match_status].fd_write, buff, strlen(buff));
 				}
+
 				else
+				{
+					pcap_send(buff, NULL, NULL, 1);
+				}
+
+			/*	else
 				{	//the lot is not belong the manage
-thread_next:
+				thread_next:
 				printf("what happened?\n");
 				sleep(2);
 					for(thread_quantity = 1; thread_quantity < MAX_THREAD; thread_quantity++)
@@ -175,8 +182,9 @@ thread_next:
 						}
 					}
 					goto thread_next;
+					
 				}
-				
+			*/
 			}
 		}
 	}
